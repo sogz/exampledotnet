@@ -1,4 +1,4 @@
-#Base image olarak aspnet 5.0 ı kullanıyoruz
+#Build imagesi olarak aspnet 5.0 ı kullanıyoruz
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 
 
@@ -18,9 +18,9 @@ COPY . ./
 RUN dotnet publish --no-restore -c Release -o out
 
 #yukarda kodlarımızı build ettik şimdi runtime işlemlerini yapalım.
-FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /app
-COPY --from-build-env 	/app/out .
+COPY --from=build /app/out .
 
 #testapp.dll i çalıştır.
 ENTRYPOINT ["dotnet", "testapp.dll"]
