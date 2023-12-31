@@ -1,24 +1,26 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+#Base image olarak aspnet 5.0 ı kullanıyoruz
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 
+
+#imajın /app klasörü içerisinde çalışacağını söyledik.
+WORKDIR /app
+
+#webapinin proje dependencylerinin tutulduğu dosyayı app klasörüne kopyaladık
+COPY *.csproj .
+
+# restore ile dependencylerin indirilmesini sağladık
+run dotnet restore
+
+# tüm dependencyleri app'ın altına kopyaladık.
+COPY . ./
+
+# projeyi publish ettik
+RUN dotnet publish --no-restore -c Release -o out
+
+#yukarda kodlarımızı build ettik şimdi runtime işlemlerini yapalım.
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+COPY --from-build-env 	/app/out .
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["testapp/testapp.csproj", "testapp/"]
-RUN dotnet restore "./testapp/./testapp.csproj"
-COPY . .
-WORKDIR "/src/testapp"
-RUN dotnet build "./testapp.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./testapp.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+#testapp.dll i çalıştır.
 ENTRYPOINT ["dotnet", "testapp.dll"]
