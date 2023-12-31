@@ -16,7 +16,7 @@ RUN dotnet add package Microsoft.OpenApi --version 1.2.3
 COPY . ./
 
 # projeyi publish ettik
-RUN dotnet publish --no-restore -c Release -o out
+RUN dotnet publish -c Release -o out
 
 #yukarda kodlarımızı build ettik şimdi runtime işlemlerini yapalım.
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
