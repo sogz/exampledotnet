@@ -9,7 +9,8 @@ WORKDIR /app
 COPY *.csproj .
 
 # restore ile dependencylerin indirilmesini sağladık
-run dotnet restore
+RUN dotnet restore
+RUN dotnet add package Microsoft.OpenApi --version 1.2.3
 
 # tüm dependencyleri app'ın altına kopyaladık.
 COPY . ./
